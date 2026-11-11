@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# Environment variables (keeps your OPENAI_API_KEY safe)
+.env
+.env.local
+
+# TypeScript build output
+dist/
+build/
