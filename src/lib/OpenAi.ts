@@ -5,13 +5,13 @@ const OpenAIEmbeddings = new OpenAI({
 });
 
 const EMBDED_MODEL = "text-embedding-3-small";
-const CHAT_MODEL="gpt-4o-mini"
+const CHAT_MODEL = "gpt-4o-mini";
 
-async function getEmbeded(text: string[]):Promise < number[][]> {
-  const {data} = await OpenAIEmbeddings.embeddings.create({
+async function getEmbeded(text: string[]): Promise<number[][]> {
+  const { data } = await OpenAIEmbeddings.embeddings.create({
     model: EMBDED_MODEL,
     input: text,
   });
-  return data.map(item => item.embedding)
+  return data.map((item) => item.embedding);
 }
 export default getEmbeded;
