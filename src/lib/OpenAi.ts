@@ -1,17 +1,31 @@
 import OpenAI from "openai";
 
-const OpenAIEmbeddings = new OpenAI({
-  apiKey: process.env.OPEN_API_SECTET_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-const EMBDED_MODEL = "text-embedding-3-small";
+const EMBED_MODEL = "text-embedding-3-small";
 const CHAT_MODEL = "gpt-4o-mini";
 
-async function getEmbeded(text: string[]): Promise<number[][]> {
-  const { data } = await OpenAIEmbeddings.embeddings.create({
-    model: EMBDED_MODEL,
-    input: text,
+export async function getEmbeddings(input: string, model?: string): Promise<number[]>;
+export async function getEmbeddings(input: string[], model?: string): Promise<number[][]>;
+
+export async function getEmbeddings(
+  input: string | string[],
+  model: string = EMBED_MODEL,
+): Promise<number[] | number[][]> {
+  if (Array.isArray(input) && input.length === 0) {
+    return [];
+  }
+
+  const { data } = await openai.embeddings.create({
+    model,
+    input,
   });
-  return data.map((item) => item.embedding);
+
+  if (Array.isArray(input)) {
+    return data.map((item) => item.embedding);
+  }
+
+  return data[0].embedding;
 }
-export default getEmbeded;
