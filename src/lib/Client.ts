@@ -6,13 +6,15 @@ export const supabase = createClient(
 );
 
 // Store Data
+// Store Data
 interface DataShape {
   content: string;
   metadata: { fileName: string };
-  embeded: number[];
+  embedding: number[];
 }
+
+
 export async function StoreChunks(data: DataShape[]) {
-  // Store in Supabase
   const { error } = await supabase.from("documents").insert(data);
   if (error) throw new Error(error.message);
 }
@@ -22,7 +24,7 @@ export async function DeleteBySource(source: string) {
   const { error, data } = await supabase
     .from("documents")
     .delete()
-    .contains("metadata", [source]);
+    .contains("metadata", { fileName: source });
   if (error) throw new Error(error.message);
   return data;
 }
@@ -33,9 +35,8 @@ export async function matchDoucments(
 ) {
   const { data: documents, error } = await supabase.rpc("match_documents", {
     query_embedding: userQueryVectorEmbede,
-    //match_threshold: 0.78, // Minimum similarity score (0 to 1)
     match_count: matchCount,
   });
-  if (error) throw new Error(error?.message)
-  return documents ?? []
+  if (error) throw new Error(error?.message);
+  return documents ?? [];
 }

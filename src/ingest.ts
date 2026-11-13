@@ -3,33 +3,29 @@ import express, { Request, Response } from "express";
 import multer from "multer";
 import { PDFParse } from "pdf-parse";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { getEmbeddings } from "./lib/OpenAi";
+import { getEmbeddings } from "./lib/providers";
 import { DeleteBySource, StoreChunks } from "./lib/Client";
-import { UserQuery } from "./Chat";
+import { UserQuery } from "./chat";
 
 const CHUNK_SIZE = 1000;
 const CHUNK_OVERLAP = 200;
 
 const app = express();
-app.use(express.json()); // Required so /chat can read req.body
+app.use(express.json());
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 async function IngestFunction(req: Request, res: Response) {
   try {
     if (!req.file) {
-      return res
-        .status(400)
-        .json({ ok: false, msg: "Client must first upload a file." });
+      return res.status(400).json({ ok: false, msg: "Client must first upload a file." });
     }
 
     // Extract text from PDF
     const parser = new PDFParse({ data: req.file.buffer });
     const { text } = await parser.getText();
     if (!text.trim()) {
-      return res
-        .status(400)
-        .json({ ok: false, msg: "File must contain readable text data." });
+      return res.status(400).json({ ok: false, msg: "File must contain readable text data." });
     }
 
     // Split text into chunks
@@ -49,7 +45,7 @@ async function IngestFunction(req: Request, res: Response) {
     const rows = chunks.map((r, idx) => ({
       content: r,
       metadata: { fileName: source },
-      embeded: embeded[idx],
+      embedding: embeded[idx],
     }));
 
     // Store chunks in database
@@ -58,17 +54,11 @@ async function IngestFunction(req: Request, res: Response) {
     return res.status(200).json({
       ok: true,
       msg: "Document embedded and ingested successfully.",
-      data: {
-        source,
-        chunksCount: rows.length,
-      },
+      data: { source, chunksCount: rows.length },
     });
   } catch (err: unknown) {
     console.error("Ingestion error:", err);
-    return res.status(500).json({
-      ok: false,
-      msg: "Server error during ingestion process.",
-    });
+    return res.status(500).json({ ok: false, msg: "Server error during ingestion process." });
   }
 }
 
