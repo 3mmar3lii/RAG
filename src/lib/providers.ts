@@ -1,5 +1,5 @@
 import { geminiEmbeddings, geminiAnswer } from "./gemini";
-import { openaiEmbeddings, openaiAnswer } from "./openai";
+import { openaiEmbeddings, openaiAnswer } from "./openai-provider";
 
 type Provider = "gemini" | "openai";
 

@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI();
 
 const EMBED_MODEL = "gemini-embedding-001";
-const CHAT_MODEL = "gemini-2.0-flash-lite";
+const CHAT_MODEL = "gemini-3.5-flash-lite";
 
 export async function geminiEmbeddings(input: string | string[]): Promise<number[] | number[][]> {
   if (Array.isArray(input) && input.length === 0) return [];
