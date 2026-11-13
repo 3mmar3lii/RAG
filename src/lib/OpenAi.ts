@@ -7,8 +7,14 @@ const openai = new OpenAI({
 const EMBED_MODEL = "text-embedding-3-small";
 const CHAT_MODEL = "gpt-4o-mini";
 
-export async function getEmbeddings(input: string, model?: string): Promise<number[]>;
-export async function getEmbeddings(input: string[], model?: string): Promise<number[][]>;
+export async function getEmbeddings(
+  input: string,
+  model?: string,
+): Promise<number[]>;
+export async function getEmbeddings(
+  input: string[],
+  model?: string,
+): Promise<number[][]>;
 
 export async function getEmbeddings(
   input: string | string[],
@@ -29,3 +35,39 @@ export async function getEmbeddings(
 
   return data[0].embedding;
 }
+
+type FinalOpenAiClientAnswerType = {
+  chunks: string[];
+  prompt: string;
+  question: string;
+};
+
+export async function finalOpenAiClientAnswer({
+  chunks,
+  prompt,
+  question,
+}: FinalOpenAiClientAnswerType) {
+  if (!chunks || !prompt || !question) {
+    throw new Error(
+      "Cannot complete this process without chunks, prompt, or question provided",
+    );
+  }
+
+  const context =
+    chunks.length > 0 ? chunks.join("\n\n") : "No matching passages were found";
+
+  const { choices } = await openai.chat.completions.create({
+    model: CHAT_MODEL,
+    messages: [
+      { role: "system", content: prompt },
+      {
+        role: "user",
+        content: `Context:\n${context}\n\nQuestion: ${question}`,
+      },
+    ],
+    temperature: 0.2,
+  });
+
+  return choices[0]?.message?.content ?? "";
+}
+

@@ -26,3 +26,16 @@ export async function DeleteBySource(source: string) {
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function matchDoucments(
+  userQueryVectorEmbede: number[],
+  matchCount = 3,
+) {
+  const { data: documents, error } = await supabase.rpc("match_documents", {
+    query_embedding: userQueryVectorEmbede,
+    //match_threshold: 0.78, // Minimum similarity score (0 to 1)
+    match_count: matchCount,
+  });
+  if (error) throw new Error(error?.message)
+  return documents ?? []
+}
