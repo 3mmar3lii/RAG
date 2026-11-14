@@ -7,7 +7,7 @@ import { getEmbeddings } from "./lib/providers";
 import { DeleteBySource, StoreChunks } from "./lib/Client";
 import { UserQuery } from "./chat";
 
-const CHUNK_SIZE = 1000;
+const CHUNK_SIZE = 2000;
 const CHUNK_OVERLAP = 200;
 
 const app = express();
